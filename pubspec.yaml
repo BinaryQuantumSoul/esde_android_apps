@@ -41,6 +41,11 @@ dependencies:
   shared_preferences: ^2.2.3
   provider: ^6.1.2
   quiver: ^3.2.1
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  image_path: "icon/icon.png"
+  android: true
 
 dev_dependencies:
   flutter_test:
