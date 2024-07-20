@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="icon/icon.png" alt="logo" height="100"/>
+</p>
+
 # ES-DE Android Apps
 This tools imports android apps into the ES-DE launcher, you need to download it independently.
 
