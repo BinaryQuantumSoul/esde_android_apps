@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:esde_android/storage.dart';
 import 'package:installed_apps/app_info.dart';
 
 class EsDeUtils {
@@ -7,10 +8,8 @@ class EsDeUtils {
       List<AppInfo> apps,
       List<AppInfo> games,
       List<AppInfo> emulators,
-      String romPath,
-      String mediaPath,
-      bool overwriteDirs) async {
-    final mediaDirs = [
+      SettingsProvider settingsProvider) async {
+    final List<String> mediaDirs = [
       '3dboxes',
       'backcovers',
       'covers',
@@ -21,6 +20,8 @@ class EsDeUtils {
       'screenshots',
       'titlescreens'
     ];
+    final String romPath = settingsProvider.pathRoms;
+    final String mediaPath = settingsProvider.pathMedia;
 
     for (var pair in [
       [apps, 'androidapps'],
@@ -33,16 +34,14 @@ class EsDeUtils {
       final Directory romDirectory = Directory('$romPath/$system');
       final Directory mediaDirectory = Directory('$mediaPath/$system');
 
-      if (overwriteDirs) {
+      if (settingsProvider.overwriteDirs) {
         if (await romDirectory.exists()) {
           await romDirectory.delete(recursive: true);
         }
-        if (await mediaDirectory.exists()) {
+        if (!settingsProvider.doNotSaveMedia && await mediaDirectory.exists()) {
           await mediaDirectory.delete(recursive: true);
         }
       }
-      await romDirectory.create();
-      await mediaDirectory.create();
 
       for (var app in appList) {
         final String escapedName = app.name
@@ -57,18 +56,16 @@ class EsDeUtils {
           fileName = '$escapedName $counter';
           file = File('$romPath/$system/$fileName.app');
         }
-
-        await file.create();
+        await file.create(recursive: true);
         await file.writeAsString(app.packageName);
 
-        for (var media in mediaDirs) {
-          if (app.icon != null) {
-            await Directory('$mediaPath/$system/$media').create();
-            final File file =
-                File('$mediaPath/$system/$media/$fileName.png');
-
-            await file.create();
-            await file.writeAsBytes(app.icon!);
+        if (!settingsProvider.doNotSaveMedia) {
+          for (var media in mediaDirs) {
+            if (app.icon != null) {
+              final File file = File('$mediaPath/$system/$media/$fileName.png');
+              await file.create(recursive: true);
+              await file.writeAsBytes(app.icon!);
+            }
           }
         }
       }

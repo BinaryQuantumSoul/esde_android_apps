@@ -28,10 +28,16 @@ class SettingsPage extends StatelessWidget {
                   settingsProvider.whitelist = newValue;
                 }),
             SwitchSetting(
-                text: 'Overwrite existing apps ',
+                text: 'Overwrite existing files ',
                 value: settingsProvider.overwriteDirs,
                 onChanged: (bool newValue) {
                   settingsProvider.overwriteDirs = newValue;
+                }),
+            SwitchSetting(
+                text: 'Do not save media ',
+                value: settingsProvider.doNotSaveMedia,
+                onChanged: (bool newValue) {
+                  settingsProvider.doNotSaveMedia = newValue;
                 }),
             PathPicker(
                 pickerText: 'ROMs',
@@ -40,13 +46,14 @@ class SettingsPage extends StatelessWidget {
                   settingsProvider.pathRoms = newString;
                 },
                 nameCheck: 'ROMs'),
-            PathPicker(
-                pickerText: 'ES-DE/downloaded_media',
-                path: settingsProvider.pathMedia,
-                onChanged: (String newString) {
-                  settingsProvider.pathMedia = newString;
-                },
-                nameCheck: 'downloaded_media'),
+            if (!settingsProvider.doNotSaveMedia)
+              PathPicker(
+                  pickerText: 'ES-DE/downloaded_media',
+                  path: settingsProvider.pathMedia,
+                  onChanged: (String newString) {
+                    settingsProvider.pathMedia = newString;
+                  },
+                  nameCheck: 'downloaded_media'),
           ],
         ),
       ),

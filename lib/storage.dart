@@ -6,11 +6,13 @@ class SettingsProvider with ChangeNotifier {
 
   late bool _whitelist;
   late bool _overwriteDirs;
+  late bool _doNotSaveMedia;
   late String _pathRoms;
   late String _pathMedia;
 
   bool get whitelist => _whitelist;
   bool get overwriteDirs => _overwriteDirs;
+  bool get doNotSaveMedia => _doNotSaveMedia;
   String get pathRoms => _pathRoms;
   String get pathMedia => _pathMedia;
 
@@ -26,6 +28,11 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  set doNotSaveMedia(bool value) {
+    _doNotSaveMedia = value;
+    prefs.setBool('setting_no_media', value);
+    notifyListeners();
+  }
 
   set pathRoms(String value) {
     _pathRoms = value;
@@ -44,6 +51,8 @@ class SettingsProvider with ChangeNotifier {
 
     _whitelist = prefs.getBool('setting_whitelist') ?? false;
     _overwriteDirs = prefs.getBool('setting_overwrite') ?? false;
+    _doNotSaveMedia = prefs.getBool('setting_no_media') ?? false;
+
     _pathRoms = prefs.getString('setting_path_roms') ?? 'no directory';
     _pathMedia = prefs.getString('setting_path_media') ?? 'no directory';
     notifyListeners();

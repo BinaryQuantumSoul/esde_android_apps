@@ -171,9 +171,8 @@ class _AppListPageState extends State<AppListPage> {
           apps,
           games,
           emulators,
-          settingsProvider.pathRoms,
-          settingsProvider.pathMedia,
-          settingsProvider.overwriteDirs);
+          settingsProvider
+      );
     } catch (e) {
       SnackBar snackBar = SnackBar(
         content: Text('Error saving apps: $e'),
