@@ -45,14 +45,28 @@ class EsDeUtils {
       await mediaDirectory.create();
 
       for (var app in appList) {
-        final File file = File('$romPath/$system/${app.name}.app');
+        final String escapedName = app.name
+            .replaceAll(':', ' -')
+            .replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
+
+        File file = File('$romPath/$system/$escapedName.app');
+        String fileName = escapedName;
+        int counter = 1;
+        while (await file.exists()) {
+          counter++;
+          fileName = '$escapedName $counter';
+          file = File('$romPath/$system/$fileName.app');
+        }
+
         await file.create();
         await file.writeAsString(app.packageName);
 
         for (var media in mediaDirs) {
           if (app.icon != null) {
             await Directory('$mediaPath/$system/$media').create();
-            final File file = File('$mediaPath/$system/$media/${app.name}.png');
+            final File file =
+                File('$mediaPath/$system/$media/$fileName.png');
+
             await file.create();
             await file.writeAsBytes(app.icon!);
           }
