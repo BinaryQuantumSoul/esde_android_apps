@@ -22,6 +22,7 @@ class AppListPage extends StatefulWidget {
 class _AppListPageState extends State<AppListPage> {
   late Map<String, int> _radioStates;
   late Map<String, bool> _checkStates;
+  late Map<String, String> _customNames;
 
   final TextEditingController _searchController = TextEditingController();
   List<AppInfo> _filteredApps = [];
@@ -34,6 +35,9 @@ class _AppListPageState extends State<AppListPage> {
             as Map<dynamic, dynamic>)
         .map((key, value) => MapEntry(key, value));
     _checkStates = (jsonDecode(widget.prefs.getString('checkStates') ?? '{}')
+            as Map<dynamic, dynamic>)
+        .map((key, value) => MapEntry(key, value));
+    _customNames = (jsonDecode(widget.prefs.getString('customNames') ?? '{}')
             as Map<dynamic, dynamic>)
         .map((key, value) => MapEntry(key, value));
 
@@ -72,6 +76,13 @@ class _AppListPageState extends State<AppListPage> {
     widget.prefs.setString('radioStates', jsonEncode(_radioStates));
   }
 
+  void _setCustomName(AppInfo app, String name) {
+    setState(() {
+      _customNames[app.packageName] = name;
+    });
+    widget.prefs.setString('customNames', jsonEncode(_customNames));
+  }
+
   void _showLoadingDialog() {
     showDialog(
       context: context,
@@ -98,6 +109,40 @@ class _AppListPageState extends State<AppListPage> {
     Navigator.of(context).pop();
   }
 
+  void _showCustomNameDialog(AppInfo app, String currentName) {
+    TextEditingController textEditingController =
+        TextEditingController(text: currentName);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('${app.name} settings'),
+          content:
+            TextField(
+            controller: textEditingController,
+            decoration: const InputDecoration(labelText: "Custom name"),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Save'),
+              onPressed: () {
+                _setCustomName(app, textEditingController.text);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _sendToEsDe(SettingsProvider settingsProvider) async {
     _showLoadingDialog();
 
@@ -108,6 +153,9 @@ class _AppListPageState extends State<AppListPage> {
             (!settingsProvider.whitelist &&
                 !(_checkStates[app.packageName] ?? false)))
         .toList();
+    for (var app in filteredAppList) {
+      app.name = _customNames[app.packageName] ?? app.name;
+    }
     final List<AppInfo> apps = filteredAppList
         .where((app) => (_radioStates[app.packageName] ?? 1) == 1)
         .toList();
@@ -205,16 +253,17 @@ class _AppListPageState extends State<AppListPage> {
 
           bool isChecked = _checkStates[app.packageName]!;
           int selectedRadio = _radioStates[app.packageName]!;
+          String customName = _customNames[app.packageName] ?? app.name;
 
           return Stack(children: [
             ListTile(
               leading: GestureDetector(
                 child: image,
-                onTap: () =>
-                    _setCheckState(app, !_checkStates[app.packageName]!),
+                onTap: () => _setCheckState(app, !isChecked),
               ),
-              title: Text(app.name),
+              title: Text(customName),
               subtitle: Text(app.packageName),
+              onLongPress: () => _showCustomNameDialog(app, customName),
               trailing: Wrap(children: [
                 LabeledCheckbox(
                   label: settingsProvider.whitelist ? 'Show' : 'Hide',
@@ -241,9 +290,8 @@ class _AppListPageState extends State<AppListPage> {
                 ),
               ]),
             ),
-            if ((settingsProvider.whitelist &&
-                    !_checkStates[app.packageName]!) ||
-                (!settingsProvider.whitelist && _checkStates[app.packageName]!))
+            if ((settingsProvider.whitelist && !isChecked) ||
+                (!settingsProvider.whitelist && isChecked))
               Positioned.fill(
                 child: IgnorePointer(
                   ignoring: true,
