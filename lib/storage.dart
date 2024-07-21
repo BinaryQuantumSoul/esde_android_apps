@@ -7,12 +7,14 @@ class SettingsProvider with ChangeNotifier {
   late bool _whitelist;
   late bool _overwriteDirs;
   late bool _doNotSaveMedia;
+  late bool _disablePathCheck;
   late String _pathRoms;
   late String _pathMedia;
 
   bool get whitelist => _whitelist;
   bool get overwriteDirs => _overwriteDirs;
   bool get doNotSaveMedia => _doNotSaveMedia;
+  bool get disablePathCheck => _disablePathCheck;
   String get pathRoms => _pathRoms;
   String get pathMedia => _pathMedia;
 
@@ -23,6 +25,10 @@ class SettingsProvider with ChangeNotifier {
   }
 
   set overwriteDirs(bool value) {
+    if (value) {
+      disablePathCheck = false;
+    }
+
     _overwriteDirs = value;
     prefs.setBool('setting_overwrite', value);
     notifyListeners();
@@ -31,6 +37,18 @@ class SettingsProvider with ChangeNotifier {
   set doNotSaveMedia(bool value) {
     _doNotSaveMedia = value;
     prefs.setBool('setting_no_media', value);
+    notifyListeners();
+  }
+
+  set disablePathCheck(bool value) {
+    if (value) {
+      overwriteDirs = false;
+    } else if (_disablePathCheck) {
+      pathRoms = '';
+    }
+
+    _disablePathCheck = value;
+    prefs.setBool('setting_disable_path_check', value);
     notifyListeners();
   }
 
@@ -52,6 +70,7 @@ class SettingsProvider with ChangeNotifier {
     _whitelist = prefs.getBool('setting_whitelist') ?? false;
     _overwriteDirs = prefs.getBool('setting_overwrite') ?? false;
     _doNotSaveMedia = prefs.getBool('setting_no_media') ?? false;
+    _disablePathCheck = prefs.getBool('setting_disable_path_check') ?? false;
 
     _pathRoms = prefs.getString('setting_path_roms') ?? 'no directory';
     _pathMedia = prefs.getString('setting_path_media') ?? 'no directory';

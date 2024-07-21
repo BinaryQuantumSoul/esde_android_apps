@@ -28,16 +28,22 @@ class SettingsPage extends StatelessWidget {
                   settingsProvider.whitelist = newValue;
                 }),
             SwitchSetting(
+                text: 'Do not save media ',
+                value: settingsProvider.doNotSaveMedia,
+                onChanged: (bool newValue) {
+                  settingsProvider.doNotSaveMedia = newValue;
+                }),
+            SwitchSetting(
                 text: 'Delete existing files ',
                 value: settingsProvider.overwriteDirs,
                 onChanged: (bool newValue) {
                   settingsProvider.overwriteDirs = newValue;
                 }),
             SwitchSetting(
-                text: 'Do not save media ',
-                value: settingsProvider.doNotSaveMedia,
+                text: 'Disable path name check',
+                value: settingsProvider.disablePathCheck,
                 onChanged: (bool newValue) {
-                  settingsProvider.doNotSaveMedia = newValue;
+                  settingsProvider.disablePathCheck = newValue;
                 }),
             PathPicker(
                 pickerText: 'ROMs',
@@ -45,7 +51,7 @@ class SettingsPage extends StatelessWidget {
                 onChanged: (String newString) {
                   settingsProvider.pathRoms = newString;
                 },
-                nameCheck: 'ROMs'),
+                nameCheck: settingsProvider.disablePathCheck ? '' : 'ROMs'),
             if (!settingsProvider.doNotSaveMedia)
               PathPicker(
                   pickerText: 'ES-DE/downloaded_media',
