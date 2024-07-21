@@ -28,7 +28,7 @@ class SettingsPage extends StatelessWidget {
                   settingsProvider.whitelist = newValue;
                 }),
             SwitchSetting(
-                text: 'Overwrite existing files ',
+                text: 'Delete existing files ',
                 value: settingsProvider.overwriteDirs,
                 onChanged: (bool newValue) {
                   settingsProvider.overwriteDirs = newValue;
