@@ -49,20 +49,13 @@ class EsDeUtils {
             .replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
 
         File file = File('$romPath/$system/$escapedName.app');
-        String fileName = escapedName;
-        int counter = 1;
-        while (await file.exists()) {
-          counter++;
-          fileName = '$escapedName $counter';
-          file = File('$romPath/$system/$fileName.app');
-        }
         await file.create(recursive: true);
         await file.writeAsString(app.packageName);
 
         if (!settingsProvider.doNotSaveMedia) {
           for (var media in mediaDirs) {
             if (app.icon != null) {
-              final File file = File('$mediaPath/$system/$media/$fileName.png');
+              final File file = File('$mediaPath/$system/$media/$escapedName.png');
               await file.create(recursive: true);
               await file.writeAsBytes(app.icon!);
             }
