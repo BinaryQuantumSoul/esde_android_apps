@@ -28,6 +28,12 @@ class SettingsPage extends StatelessWidget {
                   settingsProvider.whitelist = newValue;
                 }),
             SwitchSetting(
+                text: 'Show system apps ',
+                value: settingsProvider.showSystemApps,
+                onChanged: (bool newValue) {
+                  settingsProvider.showSystemApps = newValue;
+                }),
+            SwitchSetting(
                 text: 'Do not save media ',
                 value: settingsProvider.doNotSaveMedia,
                 onChanged: (bool newValue) {

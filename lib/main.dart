@@ -23,6 +23,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingsProvider = Provider.of<SettingsProvider>(context);
+
     return DynamicColorBuilder(builder: (lightColorScheme, darkColorScheme) {
       return MaterialApp(
           title: 'ES-DE Android',
@@ -39,7 +41,7 @@ class MyApp extends StatelessWidget {
           themeMode: ThemeMode.system,
           home: FutureBuilder(
             future: Future.wait([
-              InstalledApps.getInstalledApps(true, true),
+              InstalledApps.getInstalledApps(!settingsProvider.showSystemApps, true),
               SharedPreferences.getInstance(),
             ]),
             builder: (context, snapshot) {

@@ -5,6 +5,7 @@ class SettingsProvider with ChangeNotifier {
   late SharedPreferences prefs;
 
   late bool _whitelist;
+  late bool _showSystemApps;
   late bool _overwriteDirs;
   late bool _doNotSaveMedia;
   late bool _disablePathCheck;
@@ -12,6 +13,7 @@ class SettingsProvider with ChangeNotifier {
   late String _pathMedia;
 
   bool get whitelist => _whitelist;
+  bool get showSystemApps => _showSystemApps;
   bool get overwriteDirs => _overwriteDirs;
   bool get doNotSaveMedia => _doNotSaveMedia;
   bool get disablePathCheck => _disablePathCheck;
@@ -21,6 +23,12 @@ class SettingsProvider with ChangeNotifier {
   set whitelist(bool value) {
     _whitelist = value;
     prefs.setBool('setting_whitelist', value);
+    notifyListeners();
+  }
+
+  set showSystemApps(bool value) {
+    _showSystemApps = value;
+    prefs.setBool('setting_show_system_apps', value);
     notifyListeners();
   }
 
@@ -68,6 +76,7 @@ class SettingsProvider with ChangeNotifier {
     prefs = await SharedPreferences.getInstance();
 
     _whitelist = prefs.getBool('setting_whitelist') ?? false;
+    _showSystemApps = prefs.getBool('setting_show_system_apps') ?? false;
     _overwriteDirs = prefs.getBool('setting_overwrite') ?? false;
     _doNotSaveMedia = prefs.getBool('setting_no_media') ?? false;
     _disablePathCheck = prefs.getBool('setting_disable_path_check') ?? false;
