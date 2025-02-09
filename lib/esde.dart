@@ -1,14 +1,13 @@
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:esde_android/storage.dart';
 import 'package:installed_apps/app_info.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class EsDeUtils {
-  static Future<void> prepareEsDeFiles(
-      List<AppInfo> apps,
-      List<AppInfo> games,
-      List<AppInfo> emulators,
-      SettingsProvider settingsProvider) async {
+  static Future<void> prepareEsDeFiles(List<AppInfo> apps, List<AppInfo> games,
+      List<AppInfo> emulators, SettingsProvider settingsProvider) async {
     final List<String> mediaDirs = [
       '3dboxes',
       'backcovers',
@@ -34,6 +33,13 @@ class EsDeUtils {
       final Directory romDirectory = Directory('$romPath/$system');
       final Directory mediaDirectory = Directory('$mediaPath/$system');
 
+      if (Platform.isAndroid &&
+          (await DeviceInfoPlugin().androidInfo).version.sdkInt >= 30) {
+        await Permission.manageExternalStorage.request();
+      } else {
+        await Permission.storage.request();
+      }
+
       if (settingsProvider.overwriteDirs) {
         if (await romDirectory.exists()) {
           await romDirectory.delete(recursive: true);
@@ -55,7 +61,8 @@ class EsDeUtils {
         if (!settingsProvider.doNotSaveMedia) {
           for (var media in mediaDirs) {
             if (app.icon != null) {
-              final File file = File('$mediaPath/$system/$media/$escapedName.png');
+              final File file =
+                  File('$mediaPath/$system/$media/$escapedName.png');
               await file.create(recursive: true);
               await file.writeAsBytes(app.icon!);
             }
